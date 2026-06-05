@@ -3,1045 +3,997 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FF Tournament • Esports</title>
+    <title>FF Tournament - Active Tournaments</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        neonRed: '#ff1a1a',
+                        neonOrange: '#ff6600',
+                        darkBg: '#0a0a0a',
+                        cardBg: 'rgba(255,255,255,0.04)',
+                        cardBorder: 'rgba(255,255,255,0.08)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Orbitron:wght@500;600&amp;display=swap');
-        
-        :root {
-            --primary-red: #ff2a2a;
-            --accent-orange: #ff7b00;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Inter', system_ui, sans-serif;
-        }
-        
-        .font-gaming {
-            font-family: 'Orbitron', 'Inter', sans-serif;
-            font-weight: 600;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
         }
 
-        .dark-gaming-bg {
-            background-color: #0a0a0a;
-            background-image: 
-                radial-gradient(circle at 25% 20%, rgba(255, 42, 42, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 75% 80%, rgba(255, 123, 0, 0.05) 0%, transparent 50%);
-        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #ff1a1a, #ff6600); border-radius: 10px; }
 
-        .neon-red {
-            color: #ff2a2a;
-            text-shadow: 0 0 10px rgba(255, 42, 42, 0.7);
-        }
-
-        .neon-orange {
-            color: #ff7b00;
-            text-shadow: 0 0 10px rgba(255, 123, 0, 0.7);
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .gaming-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .gaming-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-
-        .gaming-card::before {
-            content: '';
-            position: absolute;
+        /* Background ambient effects */
+        .bg-ambient {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                135deg, 
-                rgba(255,42,42,0.08) 0%, 
-                transparent 50%
-            );
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
         }
-        
-        .gaming-card:hover::before {
+
+        .bg-ambient::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,26,26,0.08) 0%, transparent 70%);
+            animation: floatBlob1 15s ease-in-out infinite;
+        }
+
+        .bg-ambient::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,102,0,0.06) 0%, transparent 70%);
+            animation: floatBlob2 18s ease-in-out infinite;
+        }
+
+        @keyframes floatBlob1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, 80px) scale(1.2); }
+            66% { transform: translate(-50px, 120px) scale(0.9); }
+        }
+
+        @keyframes floatBlob2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-80px, -60px) scale(1.1); }
+            66% { transform: translate(60px, -100px) scale(0.95); }
+        }
+
+        /* Grid pattern overlay */
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,26,26,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,26,26,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Glassmorphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff1a1a, #ff6600, transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .glass-card:hover::before {
             opacity: 1;
         }
 
-        .nav-link {
-            transition: all 0.2s ease;
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            border-color: rgba(255, 26, 26, 0.3);
+            box-shadow:
+                0 20px 60px rgba(255, 26, 26, 0.1),
+                0 0 40px rgba(255, 102, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Glow effects */
+        .neon-text-red {
+            text-shadow: 0 0 10px rgba(255,26,26,0.5), 0 0 40px rgba(255,26,26,0.2);
+        }
+
+        .neon-text-orange {
+            text-shadow: 0 0 10px rgba(255,102,0,0.5), 0 0 40px rgba(255,102,0,0.2);
+        }
+
+        .neon-glow-red {
+            box-shadow: 0 0 15px rgba(255,26,26,0.4), 0 0 45px rgba(255,26,26,0.15);
+        }
+
+        .neon-glow-orange {
+            box-shadow: 0 0 15px rgba(255,102,0,0.4), 0 0 45px rgba(255,102,0,0.15);
+        }
+
+        /* Join button */
+        .join-btn {
+            background: linear-gradient(135deg, #ff1a1a 0%, #ff6600 100%);
+            border: none;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 12px 32px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .join-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .join-btn:hover::before {
+            left: 100%;
+        }
+
+        .join-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255,26,26,0.5), 0 0 60px rgba(255,102,0,0.3);
+        }
+
+        .join-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Filter buttons */
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 10px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: rgba(255, 26, 26, 0.4);
+            color: #ff6600;
+            background: rgba(255, 26, 26, 0.08);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, rgba(255,26,26,0.2), rgba(255,102,0,0.15));
+            border-color: rgba(255, 26, 26, 0.5);
+            color: #ff4444;
+            box-shadow: 0 0 20px rgba(255,26,26,0.15);
+        }
+
+        /* Mode badges */
+        .mode-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 5px 14px;
+            border-radius: 6px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .mode-br {
+            background: rgba(255, 26, 26, 0.15);
+            color: #ff4444;
+            border: 1px solid rgba(255, 26, 26, 0.3);
+        }
+
+        .mode-cs {
+            background: rgba(255, 102, 0, 0.15);
+            color: #ff8833;
+            border: 1px solid rgba(255, 102, 0, 0.3);
+        }
+
+        .mode-1v1 {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.25);
+        }
+
+        .mode-2v2 {
+            background: rgba(0, 170, 255, 0.1);
+            color: #00aaff;
+            border: 1px solid rgba(0, 170, 255, 0.25);
+        }
+
+        .mode-4v4 {
+            background: rgba(200, 0, 255, 0.1);
+            color: #cc66ff;
+            border: 1px solid rgba(200, 0, 255, 0.25);
+        }
+
+        /* Slot bar */
+        .slot-bar-bg {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            height: 6px;
+            overflow: hidden;
+        }
+
+        .slot-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #ff1a1a, #ff6600);
+            transition: width 1s ease;
             position: relative;
         }
-        
-        .nav-link:hover {
-            color: #ff2a2a;
+
+        .slot-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
         }
-        
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Header */
+        .header-glass {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link {
+            color: #888;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 4px 0;
+        }
+
         .nav-link::after {
             content: '';
             position: absolute;
-            width: 0;
-            height: 2px;
             bottom: -2px;
             left: 0;
-            background: linear-gradient(to right, #ff2a2a, #ff7b00);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ff1a1a, #ff6600);
             transition: width 0.3s ease;
+            border-radius: 2px;
         }
-        
+
+        .nav-link:hover {
+            color: #ff4444;
+        }
+
         .nav-link:hover::after {
             width: 100%;
         }
 
-        .section-header {
-            font-size: 2.25rem;
-            line-height: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
+        .nav-link.active-link {
+            color: #ff4444;
         }
 
-        .tournament-card {
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                       box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        
-        .tournament-card:hover {
-            transform: translateY(-8px) scale(1.01);
+        .nav-link.active-link::after {
+            width: 100%;
         }
 
-        .neon-border {
-            box-shadow: 0 0 15px rgba(255, 42, 42, 0.3);
-            border: 1px solid rgba(255, 42, 42, 0.3);
+        /* Logo pulse */
+        .logo-icon {
+            animation: logoPulse 3s ease-in-out infinite;
         }
 
-        .stat-number {
-            font-variant-numeric: tabular-nums;
+        @keyframes logoPulse {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(255,26,26,0.4)); }
+            50% { filter: drop-shadow(0 0 16px rgba(255,102,0,0.6)); }
         }
 
-        .freefire-gradient {
-            background: linear-gradient(90deg, #ff2a2a, #ff7b00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% 100%;
-            animation: gradient-shift 3s ease infinite;
+        /* Stat item */
+        .stat-divider {
+            width: 1px;
+            height: 28px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
         }
 
-        .modal {
-            animation: modalPop 0.3s ease forwards;
+        /* Card entrance animation */
+        .card-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: cardFadeIn 0.6s ease forwards;
         }
 
-        @keyframes gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .esports-bg {
-            background-image: url('data:image/svg+xml,%3Csvg width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cpath fill=%22%23111111%22 fill-opacity=%220.08%22 d=%22M11 18L18 11 50 50 82 11 89 18 50 82z%22/%3E%3C/g%3E%3C/svg%27');
-            background-size: 60px 60px;
+        /* Title section decoration */
+        .title-line {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #ff1a1a, #ff6600);
+            border-radius: 3px;
         }
 
-        .winner-card {
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: #ff1a1a;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Hamburger animation */
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #e0e0e0;
+            border-radius: 2px;
             transition: all 0.3s ease;
         }
 
-        .nav-active {
-            color: #ff2a2a;
-            font-weight: 600;
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
         }
 
-        .game-mode-badge {
-            font-size: 0.75rem;
-            padding: 0.1rem 0.65rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            letter-spacing: -.5px;
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Footer */
+        .footer-link {
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #ff4444;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-icon:hover {
+            background: rgba(255, 26, 26, 0.15);
+            border-color: rgba(255, 26, 26, 0.3);
+            color: #ff4444;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 26, 26, 0.15);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-radius: 12px;
+            padding: 16px 28px;
+            z-index: 9999;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+            opacity: 0;
+            box-shadow: 0 10px 40px rgba(255, 26, 26, 0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
-<body class="dark-gaming-bg text-white">
-    <!-- Navbar -->
-    <nav class="border-b border-white/10 bg-black/70 backdrop-blur-lg sticky top-0 z-50">
-        <div class="max-w-screen-2xl mx-auto">
-            <div class="px-6 py-4 flex items-center justify-between">
+<body class="min-h-screen">
+    <!-- Background Effects -->
+    <div class="bg-ambient"></div>
+    <div class="grid-pattern"></div>
+
+    <!-- Floating Particles Container -->
+    <div id="particles"></div>
+
+    <!-- Header -->
+    <header class="header-glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 lg:h-18">
                 <!-- Logo -->
-                <div class="flex items-center gap-x-3">
-                    <div class="w-11 h-11 bg-gradient-to-br from-red-600 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-900/50">
-                        <span class="font-gaming text-3xl font-black tracking-tighter">FF</span>
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="logo-icon w-10 h-10 rounded-lg bg-gradient-to-br from-neonRed to-neonOrange flex items-center justify-center">
+                        <i class="fas fa-crosshairs text-white text-lg"></i>
                     </div>
                     <div>
-                        <span class="font-gaming text-3xl font-bold tracking-tighter">FF</span>
-                        <span class="font-gaming text-3xl font-bold tracking-tighter bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">TOURNAMENT</span>
+                        <span class="font-orbitron font-black text-lg tracking-wider text-white">FF</span>
+                        <span class="font-orbitron font-light text-lg tracking-wider text-neutral-400"> Tournament</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-x-8 text-sm">
-                    <a href="#" class="nav-link px-3 py-2 text-sm font-medium">Home</a>
-                    <a href="#tournaments" class="nav-link px-3 py-2 text-sm font-medium">Tournaments</a>
-                    <a href="#leaderboard" class="nav-link px-3 py-2 text-sm font-medium">Leaderboard</a>
-                </div>
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link active-link">Tournaments</a>
+                    <a href="#" class="nav-link">Leaderboard</a>
+                    <a href="#" class="nav-link">Wallet</a>
+                    <a href="#" class="nav-link flex items-center gap-2">
+                        <i class="fas fa-right-to-bracket text-sm"></i> Login
+                    </a>
+                </nav>
 
-                <div class="hidden md:flex items-center gap-x-3">
-                    <button onclick="showLoginModal()" 
-                            class="px-5 py-2.5 text-sm font-semibold border border-white/30 hover:bg-white/10 transition-colors rounded-full px-6">
-                        Login
-                    </button>
-                    <button onclick="showRegisterModal()" 
-                            class="px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-full px-6">
-                        Sign Up
-                    </button>
-                </div>
-
-                <!-- Mobile Menu -->
-                <div class="md:hidden flex items-center gap-x-2">
-                    <button onclick="showLoginModal()" class="px-4 py-2 text-xs font-semibold border border-white/30 hover:bg-white/10 transition-colors rounded-full">
-                        Login
-                    </button>
-                    <button onclick="showMobileMenu()" class="w-10 h-10 flex items-center justify-center text-xl">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
+                <!-- Mobile Hamburger -->
+                <button class="hamburger md:hidden flex flex-col gap-1.5 p-2" id="hamburgerBtn" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <div class="max-w-screen-2xl mx-auto px-6 pt-8 pb-16">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-            <!-- Hero Content -->
-            <div class="max-w-lg">
-                <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-6">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-xs font-semibold tracking-wider">SEASON 4 LIVE • 124,392 PLAYERS ONLINE</span>
-                </div>
-                
-                <h1 class="text-6xl md:text-6xl font-black leading-none tracking-tighter mb-4">
-                    JOIN FREE FIRE<br> 
-                    <span class="freefire-gradient">TOURNAMENTS</span><br>
-                    &amp; WIN REWARDS
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed top-0 right-0 w-72 h-full z-50 bg-neutral-950/95 backdrop-blur-2xl border-l border-white/5" id="mobileMenu">
+        <div class="p-6 pt-20 flex flex-col gap-6">
+            <a href="#" class="text-lg font-rajdhani font-semibold text-neutral-400 hover:text-neonRed transition-colors">Home</a>
+            <a href="#" class="text-lg font-rajdhani font-semibold text-neonRed">Tournaments</a>
+            <a href="#" class="text-lg font-rajdhani font-semibold text-neutral-400 hover:text-neonRed transition-colors">Leaderboard</a>
+            <a href="#" class="text-lg font-rajdhani font-semibold text-neutral-400 hover:text-neonRed transition-colors">Wallet</a>
+            <div class="w-full h-px bg-white/5 my-2"></div>
+            <a href="#" class="flex items-center gap-2 text-lg font-rajdhani font-semibold text-neutral-400 hover:text-neonRed transition-colors">
+                <i class="fas fa-right-to-bracket text-sm"></i> Login
+            </a>
+        </div>
+    </div>
+    <div class="fixed inset-0 bg-black/60 z-40 hidden" id="menuOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-24 pb-20">
+        <!-- Title Section -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+            <div class="flex flex-col items-center text-center">
+                <div class="title-line mb-5"></div>
+                <h1 class="font-orbitron font-black text-3xl sm:text-4xl lg:text-5xl text-white tracking-wide mb-3">
+                    Active <span class="bg-gradient-to-r from-neonRed to-neonOrange bg-clip-text text-transparent">Tournaments</span>
                 </h1>
-                
-                <p class="text-lg text-white/70 mb-8 max-w-md">
-                    Compete in BR, CS, 1v1, 2v2 and 4v4 tournaments. 
-                    Prove you're the best and claim massive rewards.
+                <p class="font-rajdhani text-neutral-500 text-lg sm:text-xl font-medium tracking-wide">
+                    Choose your mode and join battles
                 </p>
-                
-                <div class="flex flex-wrap gap-4">
-                    <button onclick="joinTournament()" 
-                            class="px-8 py-4 font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl flex items-center justify-center gap-x-3 text-lg shadow-lg shadow-red-900/30">
-                        <span>JOIN TOURNAMENT</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    
-                    <button onclick="document.getElementById('tournaments').scrollIntoView({ behavior: 'smooth' })" 
-                            class="px-8 py-4 font-bold border border-white/30 hover:bg-white/10 transition-colors rounded-2xl text-lg flex items-center justify-center gap-x-3">
-                        <span>VIEW TOURNAMENTS</span>
-                    </button>
-                </div>
-                
-                <div class="flex items-center gap-x-4 mt-8">
-                    <div class="flex -space-x-2">
-                        <img src="https://i.pravatar.cc/28?img=12" class="w-7 h-7 rounded-full ring-2 ring-black" alt="">
-                        <img src="https://i.pravatar.cc/28?img=28" class="w-7 h-7 rounded-full ring-2 ring-black" alt="">
-                        <img src="https://i.pravatar.cc/28?img=47" class="w-7 h-7 rounded-full ring-2 ring-black" alt="">
-                    </div>
-                    <span class="text-xs text-white/60">Join <span class="font-semibold text-white">84,392</span> players today</span>
-                </div>
+                <div class="title-line mt-5"></div>
             </div>
-            
-            <!-- Hero Banner -->
-            <div class="relative">
-                <div class="aspect-[16/10] bg-zinc-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-                    <div class="w-full h-full bg-[url('https://picsum.photos/id/1015/1200/800')] bg-cover bg-center relative">
-                        <!-- Overlay -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-transparent"></div>
-                        
-                        <!-- Gaming UI Elements -->
-                        <div class="absolute top-5 right-5 px-4 py-1.5 glass rounded-2xl text-xs flex items-center gap-x-2">
-                            <div class="flex items-center gap-x-1.5">
-                                <i class="fas fa-tachometer-alt text-red-500"></i>
-                                <span class="font-bold">248K</span>
-                            </div>
-                            <div class="w-px h-3 bg-white/30"></div>
-                            <span class="font-medium text-xs">LIVE</span>
-                        </div>
-                        
-                        <div class="absolute bottom-5 left-5 px-4 py-2 glass rounded-2xl">
-                            <div class="flex items-center gap-x-3">
-                                <div>
-                                    <div class="text-xs text-white/60">CURRENT CHAMP</div>
-                                    <div class="font-bold">ShadowReaper</div>
-                                </div>
-                                <div class="px-3 py-1 bg-gradient-to-r from-red-600 to-orange-600 text-xs font-bold rounded-xl flex items-center">
-                                    <span>LVL 87</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Floating badge -->
-                <div class="absolute -bottom-3 -left-3 md:bottom-6 md:-left-4 px-5 py-3 glass rounded-2xl border border-white/10 shadow-xl">
-                    <div class="flex items-center gap-x-3">
-                        <div class="text-center">
-                            <div class="font-black text-2xl leading-none">142</div>
-                            <div class="text-[10px] text-white/50 tracking-widest">TOURNAMENTS</div>
-                        </div>
-                        <div class="w-px h-8 bg-white/20"></div>
-                        <div>
-                            <div class="text-xs font-medium">LIVE NOW</div>
-                            <div class="font-bold text-red-500">38 ongoing</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Statistics Section -->
-    <div class="max-w-screen-2xl mx-auto px-6 pb-16">
-        <div class="glass rounded-3xl px-8 py-8 border border-white/10">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="text-4xl font-black stat-number" id="total-players">284,392</div>
-                    <div class="text-sm text-white/60 mt-1 tracking-wider">TOTAL PLAYERS</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-black stat-number" id="total-matches">1,284,937</div>
-                    <div class="text-sm text-white/60 mt-1 tracking-wider">TOTAL MATCHES</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-black stat-number" id="active-tournaments">184</div>
-                    <div class="text-sm text-white/60 mt-1 tracking-wider">ACTIVE TOURNAMENTS</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-black stat-number text-orange-400" id="prize-pool">$4.8M</div>
-                    <div class="text-sm text-white/60 mt-1 tracking-wider">PRIZE POOL</div>
-                </div>
+        <!-- Filter Buttons -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+            <div class="flex flex-wrap items-center justify-center gap-3" id="filterContainer">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-layer-group mr-2 text-xs"></i>All
+                </button>
+                <button class="filter-btn" data-filter="br">
+                    <i class="fas fa-skull-crossbones mr-2 text-xs"></i>BR Mode
+                </button>
+                <button class="filter-btn" data-filter="cs">
+                    <i class="fas fa-gun mr-2 text-xs"></i>CS Mode
+                </button>
+                <button class="filter-btn" data-filter="1v1">
+                    <i class="fas fa-user mr-2 text-xs"></i>1v1
+                </button>
+                <button class="filter-btn" data-filter="2v2">
+                    <i class="fas fa-user-group mr-2 text-xs"></i>2v2
+                </button>
+                <button class="filter-btn" data-filter="4v4">
+                    <i class="fas fa-users mr-2 text-xs"></i>4v4
+                </button>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Featured Tournaments -->
-    <div id="tournaments" class="max-w-screen-2xl mx-auto px-6 pb-16">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
-            <div>
-                <span class="px-3 py-1 text-xs font-bold tracking-widest text-orange-400">SEASON 4</span>
-                <h2 class="section-header">Featured Tournaments</h2>
+        <!-- Tournament Cards Grid -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="tournamentGrid">
+                <!-- Cards injected by JS -->
             </div>
-            <a href="#" class="mt-2 md:mt-0 text-sm font-semibold flex items-center gap-x-2 hover:text-orange-400 transition-colors">
-                VIEW ALL TOURNAMENTS <i class="fas fa-arrow-right text-xs ml-1"></i>
-            </a>
-        </div>
-        
-        <!-- Tournament Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-            
-            <!-- BR Mode -->
-            <div class="tournament-card gaming-card glass border border-white/10 rounded-3xl p-5 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <div class="game-mode-badge bg-red-500/10 text-red-400">BR</div>
-                        <h4 class="font-bold text-xl mt-2">Battle Royale Pro</h4>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-white/50">Starts in</div>
-                        <div class="font-mono font-bold text-orange-400">2h 14m</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <div class="text-xs text-white/60">Prize Pool</div>
-                        <div class="font-black text-2xl">$75,000</div>
-                    </div>
-                    <div class="text-xs px-3 py-1 bg-white/10 rounded-2xl text-center">
-                        <div class="font-bold">10,492</div>
-                        <div class="text-[10px]">REGISTERED</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex -space-x-2">
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=15" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=32" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=47" alt=""></div>
-                    </div>
-                    <button onclick="joinTournament('Battle Royale Pro', '$75,000')" 
-                            class="px-5 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl">
-                        REGISTER
-                    </button>
-                </div>
-            </div>
-            
-            <!-- CS Mode -->
-            <div class="tournament-card gaming-card glass border border-white/10 rounded-3xl p-5 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <div class="game-mode-badge bg-orange-500/10 text-orange-400">CS</div>
-                        <h4 class="font-bold text-xl mt-2">Clash Squad Elite</h4>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-white/50">Starts in</div>
-                        <div class="font-mono font-bold text-orange-400">18h 45m</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <div class="text-xs text-white/60">Prize Pool</div>
-                        <div class="font-black text-2xl">$42,000</div>
-                    </div>
-                    <div class="text-xs px-3 py-1 bg-white/10 rounded-2xl text-center">
-                        <div class="font-bold">4,821</div>
-                        <div class="text-[10px]">REGISTERED</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex -space-x-2">
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=25" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=40" alt=""></div>
-                    </div>
-                    <button onclick="joinTournament('Clash Squad Elite', '$42,000')" 
-                            class="px-5 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl">
-                        REGISTER
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 1v1 -->
-            <div class="tournament-card gaming-card glass border border-white/10 rounded-3xl p-5 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <div class="game-mode-badge bg-red-500/10 text-red-400">1v1</div>
-                        <h4 class="font-bold text-xl mt-2">Solo Showdown</h4>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-white/50">Starts in</div>
-                        <div class="font-mono font-bold text-orange-400">4h 02m</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <div class="text-xs text-white/60">Prize Pool</div>
-                        <div class="font-black text-2xl">$18,500</div>
-                    </div>
-                    <div class="text-xs px-3 py-1 bg-white/10 rounded-2xl text-center">
-                        <div class="font-bold">8,392</div>
-                        <div class="text-[10px]">REGISTERED</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex -space-x-2">
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=8" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=19" alt=""></div>
-                    </div>
-                    <button onclick="joinTournament('Solo Showdown', '$18,500')" 
-                            class="px-5 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl">
-                        REGISTER
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 2v2 -->
-            <div class="tournament-card gaming-card glass border border-white/10 rounded-3xl p-5 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <div class="game-mode-badge bg-orange-500/10 text-orange-400">2v2</div>
-                        <h4 class="font-bold text-xl mt-2">Duo Domination</h4>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-white/50">Starts in</div>
-                        <div class="font-mono font-bold text-orange-400">1d 8h</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <div class="text-xs text-white/60">Prize Pool</div>
-                        <div class="font-black text-2xl">$31,000</div>
-                    </div>
-                    <div class="text-xs px-3 py-1 bg-white/10 rounded-2xl text-center">
-                        <div class="font-bold">3,291</div>
-                        <div class="text-[10px]">REGISTERED</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex -space-x-2">
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=29" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=35" alt=""></div>
-                    </div>
-                    <button onclick="joinTournament('Duo Domination', '$31,000')" 
-                            class="px-5 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl">
-                        REGISTER
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 4v4 -->
-            <div class="tournament-card gaming-card glass border border-white/10 rounded-3xl p-5 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <div class="game-mode-badge bg-red-500/10 text-red-400">4v4</div>
-                        <h4 class="font-bold text-xl mt-2">Squad Legends</h4>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-white/50">Starts in</div>
-                        <div class="font-mono font-bold text-orange-400">2d 12h</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <div class="text-xs text-white/60">Prize Pool</div>
-                        <div class="font-black text-2xl">$92,000</div>
-                    </div>
-                    <div class="text-xs px-3 py-1 bg-white/10 rounded-2xl text-center">
-                        <div class="font-bold">1,849</div>
-                        <div class="text-[10px]">REGISTERED</div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex -space-x-2">
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=44" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=60" alt=""></div>
-                        <div class="w-6 h-6 rounded-full ring-2 ring-black overflow-hidden"><img src="https://i.pravatar.cc/24?img=23" alt=""></div>
-                    </div>
-                    <button onclick="joinTournament('Squad Legends', '$92,000')" 
-                            class="px-5 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl">
-                        REGISTER
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Latest Winners -->
-    <div id="leaderboard" class="max-w-screen-2xl mx-auto px-6 pb-20">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
-            <div>
-                <span class="px-3 py-1 text-xs font-bold tracking-widest text-orange-400">HALL OF FAME</span>
-                <h2 class="section-header">Latest Winners</h2>
+            <!-- Empty state -->
+            <div class="hidden flex-col items-center justify-center py-20" id="emptyState">
+                <i class="fas fa-ghost text-5xl text-neutral-700 mb-4"></i>
+                <p class="font-rajdhani text-neutral-600 text-xl">No tournaments found for this mode</p>
             </div>
-            <a href="#" class="mt-2 md:mt-0 text-sm font-semibold flex items-center gap-x-2 hover:text-orange-400 transition-colors">
-                VIEW FULL LEADERBOARD <i class="fas fa-arrow-right text-xs ml-1"></i>
-            </a>
-        </div>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            <!-- Winner 1 -->
-            <div class="winner-card glass border border-white/10 rounded-3xl p-5 flex gap-x-4 items-center">
-                <div class="relative">
-                    <img src="https://i.pravatar.cc/60?img=12" class="w-14 h-14 rounded-2xl ring-2 ring-red-500/50" alt="Winner">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center rounded-full text-xs font-bold">1</div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="font-bold">BlazeKing</div>
-                    <div class="text-xs text-white/60">BR Tournament • Jan 29</div>
-                    <div class="flex items-baseline gap-x-1 mt-1">
-                        <span class="font-black text-lg text-orange-400">$12,500</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Winner 2 -->
-            <div class="winner-card glass border border-white/10 rounded-3xl p-5 flex gap-x-4 items-center">
-                <div class="relative">
-                    <img src="https://i.pravatar.cc/60?img=28" class="w-14 h-14 rounded-2xl ring-2 ring-red-500/50" alt="Winner">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center rounded-full text-xs font-bold">2</div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="font-bold">NovaStrike</div>
-                    <div class="text-xs text-white/60">CS Tournament • Jan 28</div>
-                    <div class="flex items-baseline gap-x-1 mt-1">
-                        <span class="font-black text-lg text-orange-400">$8,750</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Winner 3 -->
-            <div class="winner-card glass border border-white/10 rounded-3xl p-5 flex gap-x-4 items-center">
-                <div class="relative">
-                    <img src="https://i.pravatar.cc/60?img=47" class="w-14 h-14 rounded-2xl ring-2 ring-red-500/50" alt="Winner">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center rounded-full text-xs font-bold">3</div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="font-bold">PhantomX</div>
-                    <div class="text-xs text-white/60">1v1 Tournament • Jan 27</div>
-                    <div class="flex items-baseline gap-x-1 mt-1">
-                        <span class="font-black text-lg text-orange-400">$5,200</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Winner 4 -->
-            <div class="winner-card glass border border-white/10 rounded-3xl p-5 flex gap-x-4 items-center">
-                <div class="relative">
-                    <img src="https://i.pravatar.cc/60?img=39" class="w-14 h-14 rounded-2xl ring-2 ring-red-500/50" alt="Winner">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center rounded-full text-xs font-bold">4</div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="font-bold">VortexGod</div>
-                    <div class="text-xs text-white/60">4v4 Tournament • Jan 26</div>
-                    <div class="flex items-baseline gap-x-1 mt-1">
-                        <span class="font-black text-lg text-orange-400">$22,000</span>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
+        </section>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-black border-t border-white/10">
-        <div class="max-w-screen-2xl mx-auto px-6 py-12">
-            <div class="grid md:grid-cols-5 gap-y-10">
-                <!-- Brand -->
-                <div class="md:col-span-2">
-                    <div class="flex items-center gap-x-3">
-                        <div class="w-9 h-9 bg-gradient-to-br from-red-600 to-orange-600 rounded-2xl flex items-center justify-center">
-                            <span class="font-gaming text-2xl font-black">FF</span>
+    <footer class="relative z-10 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-neonRed to-neonOrange flex items-center justify-center">
+                            <i class="fas fa-crosshairs text-white text-sm"></i>
                         </div>
-                        <span class="font-gaming text-2xl font-bold tracking-tighter">FF TOURNAMENT</span>
+                        <span class="font-orbitron font-bold text-white tracking-wider">FF Tournament</span>
                     </div>
-                    <p class="text-white/60 text-sm mt-4 max-w-xs">The official home of Free Fire esports. Compete. Dominate. Win.</p>
-                    
-                    <div class="flex gap-x-4 mt-5">
-                        <a href="#" class="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white transition-colors"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white transition-colors"><i class="fab fa-discord"></i></a>
-                        <a href="#" class="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white transition-colors"><i class="fab fa-twitch"></i></a>
-                        <a href="#" class="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white transition-colors"><i class="fab fa-youtube"></i></a>
-                    </div>
+                    <p class="text-neutral-600 font-rajdhani text-base leading-relaxed max-w-xs">
+                        The ultimate esports platform for competitive gamers. Join tournaments, win prizes, and climb the leaderboard.
+                    </p>
                 </div>
-                
+
+                <!-- Quick Links -->
                 <div>
-                    <div class="font-semibold mb-3">Company</div>
-                    <div class="space-y-2 text-sm">
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">About Us</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Careers</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Blog</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Press</a>
-                    </div>
+                    <h4 class="font-orbitron text-sm font-bold text-neutral-400 tracking-widest uppercase mb-5">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="footer-link font-rajdhani font-medium text-base">Home</a></li>
+                        <li><a href="#" class="footer-link font-rajdhani font-medium text-base">Tournaments</a></li>
+                        <li><a href="#" class="footer-link font-rajdhani font-medium text-base">Leaderboard</a></li>
+                        <li><a href="#" class="footer-link font-rajdhani font-medium text-base">Wallet</a></li>
+                        <li><a href="#" class="footer-link font-rajdhani font-medium text-base">Support</a></li>
+                    </ul>
                 </div>
-                
+
+                <!-- Contact & Social -->
                 <div>
-                    <div class="font-semibold mb-3">Community</div>
-                    <div class="space-y-2 text-sm">
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Discord</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Forums</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Events</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Streamers</a>
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="font-semibold mb-3">Support</div>
-                    <div class="space-y-2 text-sm">
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Help Center</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Contact Us</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Rules</a>
-                        <a href="#" class="block text-white/70 hover:text-white transition-colors">Fair Play</a>
+                    <h4 class="font-orbitron text-sm font-bold text-neutral-400 tracking-widest uppercase mb-5">Contact</h4>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-center gap-3 text-neutral-600 font-rajdhani text-base">
+                            <i class="fas fa-envelope text-xs text-neutral-700"></i> support@fftournament.com
+                        </li>
+                        <li class="flex items-center gap-3 text-neutral-600 font-rajdhani text-base">
+                            <i class="fab fa-discord text-xs text-neutral-700"></i> discord.gg/fftournament
+                        </li>
+                    </ul>
+                    <div class="flex gap-3">
+                        <div class="social-icon" aria-label="Discord"><i class="fab fa-discord"></i></div>
+                        <div class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></div>
+                        <div class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></div>
+                        <div class="social-icon" aria-label="Twitter"><i class="fab fa-x-twitter"></i></div>
+                        <div class="social-icon" aria-label="Telegram"><i class="fab fa-telegram"></i></div>
                     </div>
                 </div>
             </div>
-            
-            <div class="pt-8 mt-8 border-t border-white/10 text-center md:text-left text-xs text-white/50">
-                © 2025 FF Tournament. All rights reserved. Free Fire is a registered trademark of Garena.
+
+            <!-- Bottom bar -->
+            <div class="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-neutral-700 font-rajdhani text-sm">&copy; 2025 FF Tournament. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-neutral-700 font-rajdhani text-sm hover:text-neutral-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-neutral-700 font-rajdhani text-sm hover:text-neutral-400 transition-colors">Terms of Service</a>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- Login Modal -->
-    <div id="login-modal" onclick="hideLoginModal(event)" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div onclick="event.stopImmediatePropagation()" class="glass border border-white/10 w-full max-w-md rounded-3xl p-8 modal">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-2xl">Welcome Back</h3>
-                <button onclick="hideLoginModal()" class="text-white/60 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-neonRed to-neonOrange flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check text-white text-xs"></i>
             </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-white/70">Email or Username</label>
-                    <input type="text" value="player@ff.com" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-white/70">Password</label>
-                    <input type="password" value="demo1234" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm">
-                </div>
-                
-                <div class="flex justify-between items-center text-sm">
-                    <div class="flex items-center">
-                        <input type="checkbox" checked class="accent-orange-500">
-                        <span class="ml-2 text-xs">Remember me</span>
-                    </div>
-                    <a href="#" class="text-xs text-orange-400">Forgot password?</a>
-                </div>
-                
-                <button onclick="loginUser()" class="w-full py-4 font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl mt-2">
-                    Sign In
-                </button>
-                
-                <div class="text-center text-sm">
-                    <span class="text-white/60">Don't have an account?</span> 
-                    <button onclick="hideLoginModal(); showRegisterModal()" class="text-orange-400 font-medium">Sign up</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="register-modal" onclick="hideRegisterModal(event)" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div onclick="event.stopImmediatePropagation()" class="glass border border-white/10 w-full max-w-md rounded-3xl p-8 modal">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-2xl">Create Account</h3>
-                <button onclick="hideRegisterModal()" class="text-white/60 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5 text-white/70">First Name</label>
-                        <input type="text" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm" value="Alex">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5 text-white/70">Last Name</label>
-                        <input type="text" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm" value="Rivera">
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-white/70">Email Address</label>
-                    <input type="email" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm" value="alex.rivera@ff.com">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-white/70">Username</label>
-                    <input type="text" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm" value="BlazeKing">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-white/70">Password</label>
-                    <input type="password" class="w-full bg-white/5 border border-white/20 focus:border-orange-500/50 outline-none px-4 py-3.5 rounded-2xl text-sm" value="demo1234">
-                </div>
-                
-                <button onclick="registerUser()" class="w-full py-4 font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl mt-2">
-                    Create Account
-                </button>
-                
-                <div class="text-center text-sm">
-                    <span class="text-white/60">Already have an account?</span> 
-                    <button onclick="hideRegisterModal(); showLoginModal()" class="text-orange-400 font-medium">Login</button>
-                </div>
+            <div>
+                <p class="font-rajdhani font-bold text-white text-sm" id="toastTitle">Joined Successfully</p>
+                <p class="font-rajdhani text-neutral-500 text-xs" id="toastMsg">You have been added to the tournament</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Tailwind script
-        function initializeTailwind() {
-            document.documentElement.style.setProperty('--accent', '#ff2a2a');
-        }
-        
-        // Animated counter for stats
-        function animateCounters() {
-            const counters = [
-                { id: 'total-players', target: 284392, suffix: '' },
-                { id: 'total-matches', target: 1284937, suffix: '' },
-                { id: 'active-tournaments', target: 184, suffix: '' },
-                { id: 'prize-pool', target: 4.8, suffix: 'M', prefix: '$' }
-            ];
-            
-            counters.forEach(counter => {
-                const element = document.getElementById(counter.id);
-                if (!element) return;
-                
-                let start = 0;
-                const duration = 1800;
-                const increment = counter.target / (duration / 16);
-                
-                const timer = setInterval(() => {
-                    start += increment;
-                    
-                    if (start >= counter.target) {
-                        clearInterval(timer);
-                        if (counter.id === 'prize-pool') {
-                            element.textContent = counter.prefix + counter.target + counter.suffix;
-                        } else {
-                            element.textContent = Math.floor(counter.target).toLocaleString();
-                        }
-                    } else {
-                        if (counter.id === 'prize-pool') {
-                            element.textContent = counter.prefix + start.toFixed(1) + counter.suffix;
-                        } else {
-                            element.textContent = Math.floor(start).toLocaleString();
-                        }
-                    }
-                }, 16);
-            });
-        }
-        
-        // Join tournament function
-        function joinTournament(tournamentName = 'Featured Tournament', prize = '$25,000') {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4`;
-            modal.innerHTML = `
-                <div onclick="event.target.remove()" class="glass border border-white/10 w-full max-w-md rounded-3xl p-8 modal">
-                    <div class="flex justify-center mb-5">
-                        <div class="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-red-600 to-orange-600 rounded-full">
-                            <i class="fas fa-trophy text-3xl"></i>
-                        </div>
-                    </div>
-                    
-                    <h3 class="text-center font-bold text-2xl mb-1">Join Tournament</h3>
-                    <p class="text-center text-white/60 mb-6">${tournamentName}</p>
-                    
-                    <div class="space-y-4 bg-white/5 border border-white/10 rounded-2xl p-5 mb-6">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-white/60">Entry Fee</span>
-                            <span class="font-semibold">$10</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-white/60">Prize Pool</span>
-                            <span class="font-semibold">${prize}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-white/60">Start Time</span>
-                            <span class="font-semibold">Today • 9:00 PM</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3">
-                        <button onclick="event.target.closest('.fixed').remove()" 
-                                class="flex-1 py-3.5 font-semibold border border-white/30 hover:bg-white/10 transition-colors rounded-2xl">
-                            CANCEL
-                        </button>
-                        <button onclick="confirmJoin(this)" 
-                                class="flex-1 py-3.5 font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 transition-all rounded-2xl">
-                            CONFIRM JOIN
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function confirmJoin(element) {
-            const parentModal = element.closest('.fixed');
-            if (parentModal) parentModal.remove();
-            
-            // Success toast
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 glass border border-white/10 px-5 py-4 rounded-2xl flex items-center gap-x-3 shadow-xl z-[70]`;
-            toast.innerHTML = `
-                <div class="flex items-center gap-x-3">
-                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
-                    <div>
-                        <div class="font-semibold">Registration successful!</div>
-                        <div class="text-xs text-white/60">You have joined the tournament.</div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.transition = 'all 0.3s ease';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2800);
-        }
-        
-        // Login Modal
-        function showLoginModal() {
-            document.getElementById('login-modal').classList.remove('hidden');
-            document.getElementById('login-modal').classList.add('flex');
-        }
-        
-        function hideLoginModal(e) {
-            if (!e || e.target.id === 'login-modal') {
-                const modal = document.getElementById('login-modal');
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
+        // Tournament Data
+        const tournaments = [
+            {
+                name: "Firestorm Battle Royale",
+                mode: "br",
+                modeLabel: "BR Mode",
+                entryFee: 50,
+                prizePool: 5000,
+                totalSlots: 100,
+                remainingSlots: 23,
+                date: "Jan 25, 2025",
+                time: "8:00 PM",
+                roomId: "FS25BR001"
+            },
+            {
+                name: "Clash Squad Championship",
+                mode: "cs",
+                modeLabel: "CS Mode",
+                entryFee: 30,
+                prizePool: 3000,
+                totalSlots: 48,
+                remainingSlots: 12,
+                date: "Jan 26, 2025",
+                time: "6:00 PM",
+                roomId: "CS26CH002"
+            },
+            {
+                name: "Solo Showdown Elite",
+                mode: "1v1",
+                modeLabel: "1v1",
+                entryFee: 20,
+                prizePool: 1000,
+                totalSlots: 32,
+                remainingSlots: 8,
+                date: "Jan 27, 2025",
+                time: "9:00 PM",
+                roomId: "SS27EL003"
+            },
+            {
+                name: "Duo Warfare League",
+                mode: "2v2",
+                modeLabel: "2v2",
+                entryFee: 40,
+                prizePool: 4000,
+                totalSlots: 50,
+                remainingSlots: 31,
+                date: "Jan 28, 2025",
+                time: "7:30 PM",
+                roomId: "DW28LE004"
+            },
+            {
+                name: "Squad Survival Cup",
+                mode: "4v4",
+                modeLabel: "4v4",
+                entryFee: 100,
+                prizePool: 15000,
+                totalSlots: 48,
+                remainingSlots: 5,
+                date: "Jan 29, 2025",
+                time: "8:30 PM",
+                roomId: "SQ29SC005"
+            },
+            {
+                name: "Nightfall BR Invitational",
+                mode: "br",
+                modeLabel: "BR Mode",
+                entryFee: 0,
+                prizePool: 2000,
+                totalSlots: 50,
+                remainingSlots: 50,
+                date: "Jan 30, 2025",
+                time: "10:00 PM",
+                roomId: "NF30BR006"
+            },
+            {
+                name: "Rapid Fire CS Sprint",
+                mode: "cs",
+                modeLabel: "CS Mode",
+                entryFee: 15,
+                prizePool: 1500,
+                totalSlots: 24,
+                remainingSlots: 18,
+                date: "Jan 31, 2025",
+                time: "5:00 PM",
+                roomId: "RF31CS007"
+            },
+            {
+                name: "1v1 Arena Masters",
+                mode: "1v1",
+                modeLabel: "1v1",
+                entryFee: 25,
+                prizePool: 2000,
+                totalSlots: 64,
+                remainingSlots: 42,
+                date: "Feb 1, 2025",
+                time: "7:00 PM",
+                roomId: "1A01MS008"
+            },
+            {
+                name: "Duo Deathmatch Finals",
+                mode: "2v2",
+                modeLabel: "2v2",
+                entryFee: 60,
+                prizePool: 6000,
+                totalSlots: 32,
+                remainingSlots: 2,
+                date: "Feb 2, 2025",
+                time: "9:30 PM",
+                roomId: "DD02FN009"
             }
+        ];
+
+        // Get mode class
+        function getModeClass(mode) {
+            const classes = { br: 'mode-br', cs: 'mode-cs', '1v1': 'mode-1v1', '2v2': 'mode-2v2', '4v4': 'mode-4v4' };
+            return classes[mode] || 'mode-br';
         }
-        
-        function loginUser() {
-            const modal = document.getElementById('login-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-            
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 glass border border-white/10 px-5 py-4 rounded-2xl flex items-center gap-x-3 shadow-xl z-[70]`;
-            toast.innerHTML = `
-                <div class="flex items-center gap-x-3">
-                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
-                    <div>
-                        <div class="font-semibold">Logged in successfully!</div>
-                        <div class="text-xs text-white/60">Welcome back, player.</div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.transition = 'all 0.3s ease';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+
+        // Format currency
+        function formatCurrency(amount) {
+            return amount === 0 ? 'FREE' : '<i class="fas fa-indian-rupee-sign text-xs mr-1"></i>' + amount.toLocaleString('en-IN');
         }
-        
-        // Register Modal
-        function showRegisterModal() {
-            document.getElementById('register-modal').classList.remove('hidden');
-            document.getElementById('register-modal').classList.add('flex');
-        }
-        
-        function hideRegisterModal(e) {
-            if (!e || e.target.id === 'register-modal') {
-                const modal = document.getElementById('register-modal');
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
+
+        // Render cards
+        function renderCards(filter = 'all') {
+            const grid = document.getElementById('tournamentGrid');
+            const emptyState = document.getElementById('emptyState');
+            const filtered = filter === 'all' ? tournaments : tournaments.filter(t => t.mode === filter);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
             }
-        }
-        
-        function registerUser() {
-            const modal = document.getElementById('register-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-            
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 glass border border-white/10 px-5 py-4 rounded-2xl flex items-center gap-x-3 shadow-xl z-[70]`;
-            toast.innerHTML = `
-                <div class="flex items-center gap-x-3">
-                    <i class="fas fa-check-circle text-green-400 text-xl"></i>
-                    <div>
-                        <div class="font-semibold">Account created successfully!</div>
-                        <div class="text-xs text-white/60">Welcome to FF Tournament.</div>
+
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            grid.innerHTML = filtered.map((t, i) => {
+                const fillPercent = ((t.totalSlots - t.remainingSlots) / t.totalSlots) * 100;
+                const isFree = t.entryFee === 0;
+                const isAlmostFull = t.remainingSlots <= 5;
+                const isSoldOut = t.remainingSlots === 0;
+
+                return `
+                <div class="glass-card card-animate p-5 sm:p-6 flex flex-col" style="animation-delay: ${i * 0.08}s" data-mode="${t.mode}">
+                    <!-- Top row: badge + fee -->
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="mode-badge ${getModeClass(t.mode)}">${t.modeLabel}</span>
+                        <div class="font-orbitron font-bold text-sm ${isFree ? 'text-green-400' : 'text-white'}">
+                            ${formatCurrency(t.entryFee)}
+                        </div>
                     </div>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.transition = 'all 0.3s ease';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2800);
-        }
-        
-        // Mobile Menu
-        function showMobileMenu() {
-            const mobileMenu = document.createElement('div');
-            mobileMenu.className = `fixed inset-0 bg-black/90 backdrop-blur-lg z-[60] flex md:hidden`;
-            mobileMenu.innerHTML = `
-                <div class="w-4/5 max-w-xs bg-zinc-900 border-r border-white/10 p-6">
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="flex items-center gap-x-3">
-                            <div class="w-9 h-9 bg-gradient-to-br from-red-600 to-orange-600 rounded-xl flex items-center justify-center">
-                                <span class="font-gaming text-2xl font-black">FF</span>
+
+                    <!-- Tournament Name -->
+                    <h3 class="font-rajdhani font-bold text-xl text-white mb-4 leading-tight">${t.name}</h3>
+
+                    <!-- Stats row -->
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-neonRed/20 to-neonOrange/20 flex items-center justify-center">
+                                <i class="fas fa-trophy text-neonOrange text-xs"></i>
                             </div>
-                            <span class="font-gaming text-xl font-bold">FF TOURNAMENT</span>
+                            <div>
+                                <p class="text-neutral-600 text-xs font-rajdhani">Prize Pool</p>
+                                <p class="font-orbitron font-bold text-white text-sm">${formatCurrency(t.prizePool)}</p>
+                            </div>
                         </div>
-                        <button onclick="this.closest('.fixed').remove()" class="text-2xl text-white/70">&times;</button>
+                        <div class="stat-divider"></div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-neonRed/20 to-neonOrange/20 flex items-center justify-center">
+                                <i class="fas fa-gamepad text-neonRed text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-neutral-600 text-xs font-rajdhani">Room ID</p>
+                                <p class="font-orbitron font-bold text-neutral-300 text-xs tracking-wider">${t.roomId}</p>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="space-y-1 text-lg">
-                        <a href="#" class="block px-4 py-3 rounded-2xl hover:bg-white/5 transition-colors">Home</a>
-                        <a href="#tournaments" class="block px-4 py-3 rounded-2xl hover:bg-white/5 transition-colors">Tournaments</a>
-                        <a href="#leaderboard" class="block px-4 py-3 rounded-2xl hover:bg-white/5 transition-colors">Leaderboard</a>
+
+                    <!-- Slots -->
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-neutral-500 text-xs font-rajdhani font-semibold">Slots Filling</span>
+                            <span class="font-orbitron text-xs ${isAlmostFull ? 'text-neonRed' : 'text-neutral-400'}">
+                                ${t.totalSlots - t.remainingSlots}/${t.totalSlots}
+                                ${isAlmostFull && !isSoldOut ? '<i class="fas fa-fire text-neonRed ml-1"></i>' : ''}
+                                ${isSoldOut ? ' - SOLD OUT' : ''}
+                            </span>
+                        </div>
+                        <div class="slot-bar-bg">
+                            <div class="slot-bar-fill" style="width: ${fillPercent}%"></div>
+                        </div>
+                        <p class="text-neutral-600 text-xs font-rajdhani mt-1.5">${t.remainingSlots} slots remaining</p>
                     </div>
-                    
-                    <div class="mt-10 pt-6 border-t border-white/10">
-                        <button onclick="this.closest('.fixed').remove(); showLoginModal()" class="w-full py-3 font-semibold border border-white/30 rounded-2xl mb-3">
-                            Login
-                        </button>
-                        <button onclick="this.closest('.fixed').remove(); showRegisterModal()" class="w-full py-3 font-semibold bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl">
-                            Sign Up
-                        </button>
+
+                    <!-- Date & Time -->
+                    <div class="flex items-center gap-4 mb-5 text-xs text-neutral-500 font-rajdhani">
+                        <span class="flex items-center gap-1.5">
+                            <i class="far fa-calendar text-neutral-600"></i> ${t.date}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <i class="far fa-clock text-neutral-600"></i> ${t.time}
+                        </span>
                     </div>
+
+                    <!-- Spacer -->
+                    <div class="flex-1"></div>
+
+                    <!-- Join Button -->
+                    <button class="join-btn w-full ${isSoldOut ? 'opacity-40 cursor-not-allowed' : ''}" 
+                            ${isSoldOut ? 'disabled' : ''}
+                            onclick="${isSoldOut ? '' : `joinTournament('${t.name}')`}">
+                        ${isSoldOut ? 'SOLD OUT' : 'JOIN NOW'}
+                    </button>
                 </div>
-            `;
-            document.body.appendChild(mobileMenu);
+                `;
+            }).join('');
         }
-        
-        // Keyboard shortcuts & accessibility
-        function setupKeyboardListeners() {
-            document.addEventListener('keydown', function(e) {
-                if (e.key === "Escape") {
-                    const modals = document.querySelectorAll('.fixed');
-                    if (modals.length > 0) {
-                        modals[modals.length - 1].remove();
-                    }
-                }
-                
-                if (e.metaKey && e.key === "/") {
-                    e.preventDefault();
-                    const tournaments = document.getElementById('tournaments');
-                    if (tournaments) tournaments.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-            
-            // Add subtle hover effects on tournament cards
-            const cards = document.querySelectorAll('.tournament-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    card.style.boxShadow = '0 0 20px rgba(255, 42, 42, 0.15)';
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.boxShadow = 'none';
-                });
-            });
+
+        // Filter logic
+        document.getElementById('filterContainer').addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
+
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.dataset.filter;
+            renderCards(filter);
+        });
+
+        // Join tournament
+        function joinTournament(name) {
+            showToast('Joined Successfully', `You have been added to "${name}"`);
         }
-        
-        // Initialize everything
-        function init() {
-            initializeTailwind();
-            animateCounters();
-            setupKeyboardListeners();
-            
-            // Easter egg: press 'f' key to show free fire logo effect
-            document.addEventListener('keypress', function(e) {
-                if (e.key.toLowerCase() === 'f') {
-                    const logo = document.querySelector('.font-gaming');
-                    if (logo) {
-                        logo.style.transitionDuration = '80ms';
-                        logo.style.transform = 'scale(1.2)';
-                        setTimeout(() => {
-                            logo.style.transform = 'scale(1)';
-                        }, 180);
-                    }
-                }
-            });
-            
-            // Demo: show live player count increment
-            setInterval(() => {
-                const playerEl = document.getElementById('total-players');
-                if (playerEl) {
-                    let current = parseInt(playerEl.textContent.replace(/,/g, ''));
-                    current += Math.floor(Math.random() * 3) + 1;
-                    playerEl.textContent = current.toLocaleString();
-                }
-            }, 15000);
-            
-            // Make sure all buttons have hover states
-            console.log('%c[FF Tournament] Modern esports homepage initialized successfully.', 'color:#555');
+
+        // Toast
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-        
-        // Boot the application
-        window.onload = init;
+
+        // Mobile menu
+        const hamburger = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        function toggleMenu() {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('open');
+            menuOverlay.classList.toggle('hidden');
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
+
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const count = 15;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (8 + Math.random() * 12) + 's';
+                p.style.animationDelay = (Math.random() * 10) + 's';
+                p.style.width = (1 + Math.random() * 2) + 'px';
+                p.style.height = p.style.width;
+                if (Math.random() > 0.5) {
+                    p.style.background = '#ff6600';
+                }
+                container.appendChild(p);
+            }
+        }
+
+        // Header scroll effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header-glass');
+            const scroll = window.scrollY;
+            if (scroll > 50) {
+                header.style.borderBottomColor = 'rgba(255,26,26,0.08)';
+                header.style.background = 'rgba(10,10,10,0.95)';
+            } else {
+                header.style.borderBottomColor = 'rgba(255,255,255,0.05)';
+                header.style.background = 'rgba(10,10,10,0.8)';
+            }
+            lastScroll = scroll;
+        });
+
+        // Init
+        createParticles();
+        renderCards();
     </script>
 </body>
 </html>
